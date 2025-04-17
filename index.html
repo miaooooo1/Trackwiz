@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academic Organizer</title>
+    <title>Academic Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,41 +11,24 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #ffffff; /* White background */
-            color: #1f2937; /* Dark gray text */
+            background-color: #1a1a1a; /* Dark background */
+            color: #e0e0e0; /* Light text */
         }
-        /* Lilac color theme */
-        .bg-lilac-light { background-color: #f5f3ff; } /* Lighter lilac for backgrounds */
-        .bg-lilac { background-color: #d8b4fe; } /* Main lilac */
-        .text-lilac { color: #a855f7; } /* Lilac text */
-        .border-lilac { border-color: #a855f7; }
-        .ring-lilac { --tw-ring-color: #a855f7; }
-        .hover\:bg-lilac-dark:hover { background-color: #9333ea; } /* Darker lilac on hover */
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Lilac accent color */
+        .accent-lilac {
+            --tw-bg-opacity: 1;
+            background-color: rgba(160, 110, 200, var(--tw-bg-opacity)); /* Lilac shade */
+            --tw-text-opacity: 1;
+            color: rgba(255, 255, 255, var(--tw-text-opacity));
         }
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
+        .accent-lilac-text {
+             --tw-text-opacity: 1;
+             color: rgba(190, 150, 220, var(--tw-text-opacity)); /* Lighter Lilac for text */
         }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+         .accent-lilac-border {
+             --tw-border-opacity: 1;
+             border-color: rgba(160, 110, 200, var(--tw-border-opacity));
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #d8b4fe; /* Lilac scrollbar */
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a855f7; /* Darker lilac on hover */
-        }
-        /* Modal styles */
         .modal {
             display: none; /* Hidden by default */
             position: fixed;
@@ -55,1016 +38,594 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.6); /* Black background with opacity */
-            padding-top: 60px;
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+            animation: fadeIn 0.3s ease-out;
         }
         .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 25px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 0.5rem; /* Rounded corners */
-            position: relative;
+            background-color: #2a2a2a; /* Darker modal background */
+            margin: 10% auto; /* Adjusted margin for potentially taller modal */
+            padding: 20px;
+            border: 1px solid #444;
+            width: 90%; /* Wider for routine management */
+            max-width: 600px; /* Increased max-width */
+            border-radius: 8px;
+            animation: slideIn 0.3s ease-out;
         }
         .close-button {
             color: #aaa;
-            position: absolute;
-            top: 10px;
-            right: 20px;
+            float: right;
             font-size: 28px;
             font-weight: bold;
-            cursor: pointer;
         }
         .close-button:hover,
         .close-button:focus {
-            color: black;
+            color: #fff;
             text-decoration: none;
+            cursor: pointer;
         }
-        /* Ensure inputs have good contrast and padding */
-        input[type="text"], input[type="time"], input[type="date"], input[type="url"], select, textarea {
-            border: 1px solid #d1d5db; /* Gray border */
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem; /* Rounded corners */
+        /* Input styling */
+        input[type="text"], input[type="datetime-local"], input[type="date"], input[type="url"], input[type="time"], select, textarea { /* Added time */
+            background-color: #333;
+            border: 1px solid #555;
+            color: #e0e0e0;
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 0.5rem 0.75rem; /* py-2 px-3 */
             width: 100%;
             margin-top: 0.25rem;
             margin-bottom: 0.75rem;
-            color: #1f2937; /* Dark text for readability */
+            /* Fix for time input text color in dark mode */
+             color-scheme: dark;
         }
-        label {
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-            display: block;
-        }
-        /* Button styles */
-        .btn {
-            padding: 0.6rem 1.2rem;
+         input[type="file"] { /* Kept for exam syllabus */
+            background-color: #333;
+            border: 1px solid #555;
+            color: #e0e0e0;
             border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+             margin-top: 0.25rem;
+            margin-bottom: 0.75rem;
+         }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #2a2a2a; }
+        ::-webkit-scrollbar-thumb { background-color: #555; border-radius: 4px; border: 2px solid #2a2a2a; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #777; }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-20px); opacity: 0; } }
+        .fade-out { animation: fadeOut 0.3s ease-out forwards; }
+        .slide-out { animation: slideOut 0.3s ease-out forwards; }
+        .notification-toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background-color: rgba(160, 110, 200, 0.9); color: white; padding: 12px 20px;
+            border-radius: 8px; z-index: 100; font-size: 0.9rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: none;
+            animation: fadeIn 0.5s, fadeOut 0.5s 4.5s forwards;
+        }
+        /* Styling for weekly view */
+        .day-column { min-height: 100px; } /* Ensure columns have some height */
+
+        /* Styling for Status Section */
+        #classStatusSection .status-label {
+            font-size: 0.8rem;
+            color: #a0aec0; /* gray-500 */
+            margin-bottom: 0.1rem;
+        }
+        #classStatusSection .status-value {
+            font-size: 1rem;
             font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            color: #e0e0e0; /* gray-200 */
         }
-        .btn:active {
-            transform: scale(0.98);
+         #classStatusSection .status-value.highlight {
+             color: rgba(190, 150, 220, 1); /* accent-lilac-text */
+             font-weight: 600;
+         }
+        #countdownTimer {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: rgba(190, 150, 220, 1); /* accent-lilac-text */
+            letter-spacing: 0.05em;
         }
-        .btn-primary {
-            background-color: #a855f7; /* Lilac */
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: #9333ea; /* Darker Lilac */
-        }
-        .btn-secondary {
-            background-color: #e5e7eb; /* Light Gray */
-            color: #374151; /* Dark Gray Text */
-        }
-        .btn-secondary:hover {
-            background-color: #d1d5db; /* Medium Gray */
-        }
-        .btn-danger {
-            background-color: #ef4444; /* Red */
-            color: white;
-        }
-        .btn-danger:hover {
-            background-color: #dc2626; /* Darker Red */
-        }
-        /* Tab styles */
-        .tab-button {
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: border-color 0.3s ease, color 0.3s ease;
-            font-weight: 500;
-            color: #6b7280; /* Gray text for inactive tabs */
-        }
-        .tab-button.active {
-            border-color: #a855f7; /* Lilac border */
-            color: #a855f7; /* Lilac text */
-        }
-        .tab-button:hover {
-            color: #a855f7;
-        }
-        .tab-content {
-            display: none; /* Hide tab content by default */
-        }
-        .tab-content.active {
-            display: block; /* Show active tab content */
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        /* Card styles */
-        .card {
-            background-color: white;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        /* Notification prompt */
-        #notification-prompt {
-            position: fixed;
-            bottom: 1rem;
-            left: 1rem;
-            background-color: #1f2937; /* Dark background */
-            color: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            z-index: 100;
-            display: none; /* Hidden initially */
-        }
-         /* Custom message box */
-        #message-box {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            background-color: #1f2937; /* Dark background */
-            color: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            z-index: 100;
-            display: none; /* Hidden initially */
-            max-width: 300px;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        #message-box.show {
-            display: block;
-            opacity: 1;
-        }
+
+
     </style>
 </head>
-<body class="bg-lilac-light min-h-screen">
+<body class="min-h-screen flex flex-col">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-lilac mb-2">Academic Organizer</h1>
-            <p class="text-gray-600">Your personal dashboard for classes, exams, and assignments.</p>
-        </header>
+    <header class="bg-gray-900 shadow-md p-4 sticky top-0 z-40">
+        <h1 class="text-2xl font-bold text-center accent-lilac-text">Academic Dashboard</h1>
+    </header>
 
-        <div class="mb-6 border-b border-gray-200">
-            <nav class="-mb-px flex justify-center space-x-4 md:space-x-8" aria-label="Tabs">
-                <button class="tab-button active" data-tab="classes">Classes</button>
-                <button class="tab-button" data-tab="exams">Exams</button>
-                <button class="tab-button" data-tab="assignments">Assignments</button>
-                <button class="tab-button" data-tab="notes">Class Notes</button>
-            </nav>
+    <main class="flex-grow container mx-auto p-4 space-y-6">
+
+        <section id="classStatusSection" class="bg-gray-800 p-4 rounded-lg shadow-lg">
+            <h2 class="text-xl font-semibold accent-lilac-text mb-3">Class Status</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center md:text-left">
+                <div>
+                    <p class="status-label">Current Class</p>
+                    <p id="currentClassInfo" class="status-value truncate" title="No current class">--</p>
+                </div>
+                <div>
+                    <p class="status-label">Next Class Today</p>
+                    <p id="nextClassInfo" class="status-value truncate" title="No more classes today">--</p>
+                </div>
+                <div>
+                    <p class="status-label">Time Until Next</p>
+                    <p id="countdownTimer" class="status-value">--:--:--</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="classes" class="bg-gray-800 p-4 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xl font-semibold accent-lilac-text">This Week's Classes</h2>
+                <button id="manageRoutineBtn" class="accent-lilac px-3 py-1 rounded-md text-sm font-medium hover:bg-opacity-80 transition-colors duration-200">Manage Routine</button>
+            </div>
+            <div id="weeklyClassView" class="space-y-4">
+                <p class="text-gray-400 italic">Loading weekly schedule...</p>
+            </div>
+        </section>
+
+        <section id="exams" class="bg-gray-800 p-4 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
+             <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xl font-semibold accent-lilac-text">Exams</h2>
+                <button id="addExamBtn" class="accent-lilac px-3 py-1 rounded-md text-sm font-medium hover:bg-opacity-80 transition-colors duration-200">+</button>
+            </div>
+            <div id="examList" class="space-y-3">
+                 <p class="text-gray-400 italic">No exams scheduled yet.</p>
+            </div>
+        </section>
+
+        <section id="notes" class="bg-gray-800 p-4 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
+             <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xl font-semibold accent-lilac-text">Class Notes</h2>
+                <button id="addNoteBtn" class="accent-lilac px-3 py-1 rounded-md text-sm font-medium hover:bg-opacity-80 transition-colors duration-200">+</button>
+            </div>
+             <div id="noteList" class="space-y-3">
+                 <p class="text-gray-400 italic">No notes added yet.</p>
+            </div>
+        </section>
+
+        <section id="assignments" class="bg-gray-800 p-4 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
+             <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xl font-semibold accent-lilac-text">Assignments</h2>
+                 <button id="addAssignmentBtn" class="accent-lilac px-3 py-1 rounded-md text-sm font-medium hover:bg-opacity-80 transition-colors duration-200">+</button>
+            </div>
+            <div id="assignmentList" class="space-y-3">
+                 <p class="text-gray-400 italic">No assignments tracked yet.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-900 text-center text-xs text-gray-500 p-3 mt-6">
+        Academic Dashboard &copy; 2025
+    </footer>
+
+    <div id="manageRoutineModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('manageRoutineModal')">&times;</span>
+            <h3 class="text-lg font-semibold mb-4 accent-lilac-text">Manage Weekly Class Routine</h3>
+            <form id="addRoutineItemForm" class="mb-6 pb-4 border-b border-gray-600">
+                <h4 class="text-md font-semibold mb-2 text-gray-300">Add Class to Routine</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                    <div><label for="routineClassName">Class Name:</label><input type="text" id="routineClassName" name="routineClassName" required></div>
+                    <div><label for="routineDay">Day of Week:</label><select id="routineDay" name="routineDay" required><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option><option value="0">Sunday</option></select></div>
+                </div>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                     <div><label for="routineStartTime">Start Time:</label><input type="time" id="routineStartTime" name="routineStartTime" required></div>
+                     <div><label for="routineEndTime">End Time:</label><input type="time" id="routineEndTime" name="routineEndTime"></div>
+                 </div>
+                 <div><label for="routineLocation">Location/Link:</label><input type="text" id="routineLocation" name="routineLocation"></div>
+                <button type="submit" class="w-full md:w-auto accent-lilac mt-2 py-2 px-4 rounded-md hover:bg-opacity-80 transition-colors duration-200">Add to Routine</button>
+            </form>
+            <h4 class="text-md font-semibold mb-2 text-gray-300">Current Routine</h4>
+            <div id="currentRoutineList" class="space-y-2 max-h-60 overflow-y-auto"><p class="text-gray-400 italic">No routine set yet.</p></div>
         </div>
-
-        <main>
-            <div id="tab-classes" class="tab-content active">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-semibold">Upcoming Classes</h2>
-                    <button id="addClassBtn" class="btn btn-primary">Add Class</button>
-                </div>
-                <div id="weeklySchedule" class="space-y-4">
-                    </div>
-            </div>
-
-            <div id="tab-exams" class="tab-content">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-semibold">Exams</h2>
-                    <button id="addExamBtn" class="btn btn-primary">Add Exam</button>
-                </div>
-                <div id="examList" class="space-y-3">
-                    </div>
-            </div>
-
-            <div id="tab-assignments" class="tab-content">
-                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-semibold">Assignments</h2>
-                    <button id="addAssignmentBtn" class="btn btn-primary">Add Assignment</button>
-                </div>
-                <div id="assignmentList" class="space-y-3">
-                    </div>
-            </div>
-
-            <div id="tab-notes" class="tab-content">
-                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-semibold">Class Notes (Sorted by Date)</h2>
-                    <button id="addNoteBtn" class="btn btn-primary">Add Note Link</button>
-                </div>
-                 <div id="noteList" class="space-y-3">
-                    </div>
-            </div>
-        </main>
     </div>
-
-    <div id="classModal" class="modal">
-        <div class="modal-content fade-in">
-            <span class="close-button" onclick="closeModal('classModal')">&times;</span>
-            <h3 id="classModalTitle" class="text-xl font-semibold mb-4">Add New Class</h3>
-            <form id="classForm">
-                <input type="hidden" id="classId"> <div>
-                    <label for="classSubject">Subject/Course Name:</label>
-                    <input type="text" id="classSubject" required>
-                </div>
-                <div>
-                    <label for="classDay">Day of Week:</label>
-                    <select id="classDay" required>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                        <option value="Sunday">Sunday</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="classTime">Time:</label>
-                    <input type="time" id="classTime" required>
-                </div>
-                 <div>
-                    <label for="classLocation">Location (Optional):</label>
-                    <input type="text" id="classLocation">
-                </div>
-                <div class="flex justify-end space-x-2 mt-4">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('classModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Class</button>
-                </div>
+    <div id="addExamModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('addExamModal')">&times;</span>
+            <h3 class="text-lg font-semibold mb-3 accent-lilac-text">Add New Exam</h3>
+            <form id="addExamForm">
+                <label for="examName">Exam Name/Subject:</label><input type="text" id="examName" name="examName" required>
+                <label for="examDateTime">Date & Time:</label><input type="datetime-local" id="examDateTime" name="examDateTime" required>
+                <label for="examSyllabus">Syllabus (Optional):</label><input type="file" id="examSyllabus" name="examSyllabus" accept=".pdf,.doc,.docx,.txt">
+                 <p class="text-xs text-gray-400 -mt-2 mb-3">Note: File is not actually uploaded, only the name is stored.</p>
+                <button type="submit" class="w-full accent-lilac mt-4 py-2 rounded-md hover:bg-opacity-80 transition-colors duration-200">Add Exam</button>
             </form>
         </div>
     </div>
-
-    <div id="examModal" class="modal">
-        <div class="modal-content fade-in">
-            <span class="close-button" onclick="closeModal('examModal')">&times;</span>
-            <h3 id="examModalTitle" class="text-xl font-semibold mb-4">Add New Exam</h3>
-            <form id="examForm">
-                 <input type="hidden" id="examId">
-                 <div>
-                    <label for="examSubject">Subject/Course Name:</label>
-                    <input type="text" id="examSubject" required>
-                </div>
-                <div>
-                    <label for="examDate">Date:</label>
-                    <input type="date" id="examDate" required>
-                </div>
-                 <div>
-                    <label for="examTime">Time:</label>
-                    <input type="time" id="examTime" required>
-                </div>
-                <div>
-                    <label for="examSyllabus">Syllabus Link (Optional):</label>
-                    <input type="url" id="examSyllabus" placeholder="https://...">
-                </div>
-                 <div>
-                    <label for="examLocation">Location (Optional):</label>
-                    <input type="text" id="examLocation">
-                </div>
-                <div class="flex justify-end space-x-2 mt-4">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('examModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Exam</button>
-                </div>
+    <div id="addNoteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('addNoteModal')">&times;</span>
+            <h3 class="text-lg font-semibold mb-3 accent-lilac-text">Add Class Note</h3>
+            <form id="addNoteForm">
+                <label for="noteSubject">Subject/Course:</label><input type="text" id="noteSubject" name="noteSubject" required>
+                <label for="noteTitle">Note Title/Topic:</label><input type="text" id="noteTitle" name="noteTitle" required>
+                <label for="noteLink">Note Link (URL):</label><input type="url" id="noteLink" name="noteLink" placeholder="https://..." required>
+                <button type="submit" class="w-full accent-lilac mt-4 py-2 rounded-md hover:bg-opacity-80 transition-colors duration-200">Add Note</button>
             </form>
         </div>
     </div>
-
-    <div id="assignmentModal" class="modal">
-        <div class="modal-content fade-in">
-             <span class="close-button" onclick="closeModal('assignmentModal')">&times;</span>
-            <h3 id="assignmentModalTitle" class="text-xl font-semibold mb-4">Add New Assignment</h3>
-            <form id="assignmentForm">
-                 <input type="hidden" id="assignmentId">
-                 <div>
-                    <label for="assignmentSubject">Subject/Course Name:</label>
-                    <input type="text" id="assignmentSubject" required>
-                </div>
-                <div>
-                    <label for="assignmentDesc">Description:</label>
-                    <textarea id="assignmentDesc" rows="3" required></textarea>
-                </div>
-                <div>
-                    <label for="assignmentDueDate">Due Date:</label>
-                    <input type="date" id="assignmentDueDate" required>
-                </div>
-                 <div>
-                    <label for="assignmentDueTime">Due Time (Optional):</label>
-                    <input type="time" id="assignmentDueTime">
-                </div>
-                <div class="flex justify-end space-x-2 mt-4">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('assignmentModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Assignment</button>
-                </div>
+     <div id="addAssignmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('addAssignmentModal')">&times;</span>
+            <h3 class="text-lg font-semibold mb-3 accent-lilac-text">Add New Assignment</h3>
+            <form id="addAssignmentForm">
+                <label for="assignmentName">Assignment Name/Task:</label><input type="text" id="assignmentName" name="assignmentName" required>
+                 <label for="assignmentSubject">Subject/Course:</label><input type="text" id="assignmentSubject" name="assignmentSubject">
+                <label for="assignmentDueDate">Due Date:</label><input type="date" id="assignmentDueDate" name="assignmentDueDate" required>
+                <button type="submit" class="w-full accent-lilac mt-4 py-2 rounded-md hover:bg-opacity-80 transition-colors duration-200">Add Assignment</button>
             </form>
         </div>
     </div>
-
-     <div id="noteModal" class="modal">
-        <div class="modal-content fade-in">
-             <span class="close-button" onclick="closeModal('noteModal')">&times;</span>
-            <h3 id="noteModalTitle" class="text-xl font-semibold mb-4">Add New Note Link</h3>
-            <form id="noteForm">
-                 <input type="hidden" id="noteId">
-                 <div>
-                    <label for="noteSubject">Subject/Course Name:</label>
-                    <input type="text" id="noteSubject" required>
-                </div>
-                <div>
-                    <label for="noteTitle">Note Title/Description:</label>
-                    <input type="text" id="noteTitle" required>
-                </div>
-                 <div>
-                    <label for="noteDate">Date (Optional):</label>
-                    <input type="date" id="noteDate">
-                </div>
-                 <div>
-                    <label for="noteLink">Link to Note (PDF, Google Drive, etc.):</label>
-                    <input type="url" id="noteLink" placeholder="https://" required>
-                </div>
-                <div class="flex justify-end space-x-2 mt-4">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('noteModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Note Link</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="notification-prompt">
-        <p class="mb-2">Enable notifications to get reminders?</p>
-        <button id="enableNotificationsBtn" class="btn btn-primary text-sm mr-2">Enable</button>
-        <button id="dismissNotificationsBtn" class="btn btn-secondary text-sm">Dismiss</button>
-    </div>
-
-    <div id="message-box">
-        <p id="message-box-text"></p>
-    </div>
+    <div id="notificationToast" class="notification-toast">This is a notification!</div>
 
 
     <script>
-        // --- Constants ---
-        const LOCAL_STORAGE_KEYS = {
-            CLASSES: 'academicOrganizer_classes',
-            EXAMS: 'academicOrganizer_exams',
-            ASSIGNMENTS: 'academicOrganizer_assignments',
-            NOTES: 'academicOrganizer_notes',
-            NOTIFICATIONS_ENABLED: 'academicOrganizer_notificationsEnabled',
-            NOTIFIED_EVENTS: 'academicOrganizer_notifiedEvents' // Store IDs of events already notified
-        };
-        const NOTIFICATION_LEAD_TIME_MINUTES = 40; // Remind 40 minutes before class/exam
-        const ASSIGNMENT_DUE_SOON_HOURS = 24; // Notify if assignment due within 24 hours
-        const DELETE_CONFIRM_MSG = "Hold up!"; // *** UPDATED: Custom delete confirmation message ***
+        // --- Constants and State ---
+        const CLASS_REMINDER_MINUTES = 40;
+        const ASSIGNMENT_REMINDER_HOURS = 24;
+        const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        let classStatusInterval = null; // To hold the interval ID for the status timer
+
+        // --- DOM Elements ---
+        const weeklyClassViewEl = document.getElementById('weeklyClassView');
+        const currentRoutineListEl = document.getElementById('currentRoutineList');
+        const examListEl = document.getElementById('examList');
+        const noteListEl = document.getElementById('noteList');
+        const assignmentListEl = document.getElementById('assignmentList');
+        const notificationToast = document.getElementById('notificationToast');
+        // New elements for class status
+        const currentClassInfoEl = document.getElementById('currentClassInfo');
+        const nextClassInfoEl = document.getElementById('nextClassInfo');
+        const countdownTimerEl = document.getElementById('countdownTimer');
+
 
         // --- Utility Functions ---
-        const $ = (selector) => document.querySelector(selector);
-        const $$ = (selector) => document.querySelectorAll(selector);
-
-        // Get data from localStorage
-        const getData = (key) => JSON.parse(localStorage.getItem(key) || '[]');
-
-        // Save data to localStorage
+        const getData = (key) => JSON.parse(localStorage.getItem(key)) || [];
         const saveData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
-
-        // Generate unique ID
         const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
 
-        // Format time (e.g., 14:30 -> 2:30 PM)
+        // Format Time (HH:MM AM/PM)
         const formatTime = (timeString) => {
-            if (!timeString) return '';
-            const [hour, minute] = timeString.split(':');
-            const hourNum = parseInt(hour, 10);
-            const ampm = hourNum >= 12 ? 'PM' : 'AM';
-            const formattedHour = hourNum % 12 || 12; // Convert 0 to 12 for 12 AM/PM
-            return `${formattedHour}:${minute} ${ampm}`;
+             if (!timeString) return '';
+             try {
+                 const [hours, minutes] = timeString.split(':');
+                 const date = new Date(); date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+                 return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+             } catch (e) { console.error("Error formatting time:", timeString, e); return 'Invalid Time'; }
+         };
+
+        // Format Date and Time
+        const formatDateTime = (isoString) => {
+            if (!isoString) return 'N/A';
+            try {
+                const date = new Date(isoString); if (isNaN(date)) return 'Invalid Date';
+                return date.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+            } catch (e) { console.error("Error formatting date:", isoString, e); return 'Invalid Date'; }
         };
 
-        // Format date (e.g., 2025-04-18 -> April 18, 2025)
-        const formatDate = (dateString) => {
-            if (!dateString) return '';
-            // Add T00:00:00 to ensure consistent parsing across browsers, treating it as local time
-            const date = new Date(dateString + 'T00:00:00');
-             return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        }
+        // Format Date only
+        const formatDate = (isoString) => {
+             if (!isoString) return 'N/A';
+             const dateStr = isoString.includes('T') ? isoString : `${isoString}T00:00:00`;
+             try {
+                 const date = new Date(dateStr); if (isNaN(date)) return 'Invalid Date';
+                 return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+             } catch (e) { console.error("Error formatting date:", isoString, e); return 'Invalid Date'; }
+        };
 
-        // Show custom message
-        const showMessage = (text, duration = 3000) => {
-            const box = $('#message-box');
-            const boxText = $('#message-box-text');
-            if (!box || !boxText) return;
+        // Format Date for Notes
+        const formatNoteDate = (isoString) => {
+            if (!isoString) return 'N/A';
+            try {
+                const date = new Date(isoString); if (isNaN(date)) return 'Invalid Date';
+                return date.toLocaleDateString('en-US', { dateStyle: 'medium' });
+            } catch (e) { console.error("Error formatting note date:", isoString, e); return 'Invalid Date'; }
+        };
 
-            boxText.textContent = text;
-            box.classList.add('show');
-
-            // Clear any existing timer
-            if (box.timerId) {
-                clearTimeout(box.timerId);
-            }
-            // Set new timer
-            box.timerId = setTimeout(() => {
-                box.classList.remove('show');
-                box.timerId = null; // Clear timerId after hiding
-            }, duration);
-        }
+        // Show Custom Toast Notification
+        const showToast = (message) => {
+            notificationToast.textContent = message;
+            notificationToast.style.display = 'block';
+            setTimeout(() => { notificationToast.style.display = 'none'; }, 5000);
+        };
 
         // --- Modal Handling ---
-        const openModal = (modalId, data = null) => {
-            const modal = $(`#${modalId}`);
-            const form = modal.querySelector('form');
-            const title = modal.querySelector('h3');
-            form.reset(); // Clear previous data
-            form.querySelector('input[type="hidden"]').value = ''; // Clear ID
-
-            if (data) { // Editing existing item
-                title.textContent = title.textContent.replace('Add New', 'Edit');
-                form.querySelector('input[type="hidden"]').value = data.id;
-                // Populate form fields based on modal type
-                switch (modalId) {
-                    case 'classModal':
-                        $('#classSubject').value = data.subject;
-                        $('#classDay').value = data.day;
-                        $('#classTime').value = data.time;
-                        $('#classLocation').value = data.location || '';
-                        break;
-                    case 'examModal':
-                         $('#examSubject').value = data.subject;
-                        $('#examDate').value = data.date;
-                        $('#examTime').value = data.time;
-                        $('#examSyllabus').value = data.syllabusLink || '';
-                        $('#examLocation').value = data.location || '';
-                        break;
-                    case 'assignmentModal':
-                        $('#assignmentSubject').value = data.subject;
-                        $('#assignmentDesc').value = data.description;
-                        $('#assignmentDueDate').value = data.dueDate;
-                        $('#assignmentDueTime').value = data.dueTime || '';
-                        break;
-                    case 'noteModal':
-                        $('#noteSubject').value = data.subject;
-                        $('#noteTitle').value = data.title;
-                        $('#noteLink').value = data.link;
-                        $('#noteDate').value = data.date || ''; // Populate date field
-                        break;
-                }
-            } else { // Adding new item
-                 title.textContent = title.textContent.replace('Edit', 'Add New');
+        const openModal = (modalId) => {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'block'; modal.offsetWidth;
+                modal.querySelector('.modal-content').classList.remove('slide-out');
+                if (modalId === 'manageRoutineModal') renderCurrentRoutine();
             }
-
-            modal.style.display = 'block';
         };
-
         const closeModal = (modalId) => {
-            $(`#${modalId}`).style.display = 'none';
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                const modalContent = modal.querySelector('.modal-content');
+                modalContent.classList.add('slide-out');
+                setTimeout(() => { modal.style.display = 'none'; modalContent.classList.remove('slide-out'); }, 300);
+            }
         };
-
-        // Close modal if clicked outside of content
         window.onclick = (event) => {
-            $$('.modal').forEach(modal => {
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
-            });
+            document.querySelectorAll('.modal').forEach(modal => { if (event.target == modal) closeModal(modal.id); });
         };
-
-        // --- Data Storage & Retrieval ---
-        let classes = getData(LOCAL_STORAGE_KEYS.CLASSES);
-        let exams = getData(LOCAL_STORAGE_KEYS.EXAMS);
-        let assignments = getData(LOCAL_STORAGE_KEYS.ASSIGNMENTS);
-        let notes = getData(LOCAL_STORAGE_KEYS.NOTES);
-        let notifiedEvents = getData(LOCAL_STORAGE_KEYS.NOTIFIED_EVENTS); // Track notified events
 
         // --- Rendering Functions ---
 
-        // Render Weekly Class Schedule
-        const renderClasses = () => {
-            const scheduleContainer = $('#weeklySchedule');
-            scheduleContainer.innerHTML = ''; // Clear existing schedule
-            const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-            daysOfWeek.forEach(day => {
-                const dayClasses = classes
-                    .filter(c => c.day === day)
-                    .sort((a, b) => a.time.localeCompare(b.time)); // Sort classes by time
-
-                const dayCard = document.createElement('div');
-                dayCard.className = 'card bg-white'; // Use card style
-
-                let content = `<h3 class="text-lg font-semibold mb-3 text-lilac border-b border-lilac pb-1">${day}</h3>`;
-                if (dayClasses.length > 0) {
-                    content += '<ul class="space-y-2">';
-                    dayClasses.forEach(c => {
-                        content += `
-                            <li class="flex justify-between items-center p-2 rounded hover:bg-lilac-light transition duration-150">
-                                <div>
-                                    <span class="font-medium">${c.subject}</span>
-                                    <span class="text-sm text-gray-600 ml-2">${formatTime(c.time)}</span>
-                                    ${c.location ? `<span class="text-sm text-gray-500 ml-2 italic">(${c.location})</span>` : ''}
-                                </div>
-                                <div class="space-x-1">
-                                    <button class="text-blue-500 hover:text-blue-700 text-xs" onclick="editClass('${c.id}')">Edit</button>
-                                    <button class="text-red-500 hover:text-red-700 text-xs" onclick="deleteClass('${c.id}')">Delete</button>
-                                </div>
-                            </li>
-                        `;
-                    });
-                    content += '</ul>';
-                } else {
-                    content += '<p class="text-gray-500 text-sm">No classes scheduled.</p>';
-                }
-                dayCard.innerHTML = content;
-                scheduleContainer.appendChild(dayCard);
-            });
-             if (classes.length === 0) {
-                 scheduleContainer.innerHTML = '<p class="text-center text-gray-500 mt-4">No classes added yet. Click "Add Class" to start.</p>';
-            }
+        // Render Weekly Class View (No change from previous version)
+        const renderWeeklyClasses = () => {
+            const routine = getData('weeklyRoutine'); weeklyClassViewEl.innerHTML = '';
+            if (routine.length === 0) { weeklyClassViewEl.innerHTML = '<p class="text-gray-400 italic">No weekly routine set. Click "Manage Routine" to add classes.</p>'; return; }
+            const today = new Date(); const currentDayOfWeek = today.getDay();
+            const startOfWeek = new Date(today); startOfWeek.setDate(today.getDate() - currentDayOfWeek); startOfWeek.setHours(0, 0, 0, 0);
+            const weekContainer = document.createElement('div'); weekContainer.className = 'grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3';
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(startOfWeek); dayDate.setDate(startOfWeek.getDate() + i);
+                const dayColumn = document.createElement('div'); dayColumn.className = 'bg-gray-700 p-3 rounded-md day-column';
+                const dayName = DAYS_OF_WEEK[i]; const dateString = dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const isToday = dayDate.toDateString() === today.toDateString();
+                dayColumn.innerHTML = `<h4 class="font-semibold text-sm mb-2 ${isToday ? 'accent-lilac-text underline' : 'text-gray-300'}">${dayName} (${dateString})</h4>`;
+                const classesForDay = routine.filter(item => parseInt(item.day, 10) === i).sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+                const classItemsContainer = document.createElement('div'); classItemsContainer.className = 'space-y-2';
+                if (classesForDay.length === 0) { classItemsContainer.innerHTML = `<p class="text-xs text-gray-500 italic">No classes</p>`; }
+                else { classesForDay.forEach(cls => {
+                        const classDiv = document.createElement('div'); classDiv.className = 'bg-gray-600 p-2 rounded text-xs';
+                        classDiv.innerHTML = `<p class="font-medium text-white">${cls.name}</p><p class="text-gray-300">${formatTime(cls.startTime)}${cls.endTime ? ' - ' + formatTime(cls.endTime) : ''}</p>${cls.location ? `<p class="text-gray-400 truncate" title="${cls.location}">${cls.location}</p>` : ''}`;
+                        classItemsContainer.appendChild(classDiv); }); }
+                dayColumn.appendChild(classItemsContainer); weekContainer.appendChild(dayColumn);
+            } weeklyClassViewEl.appendChild(weekContainer);
         };
 
-        // Render Exams
-        const renderExams = () => {
-            const listContainer = $('#examList');
-            listContainer.innerHTML = ''; // Clear list
-            exams.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time)); // Sort by date and time
+        // Render Current Routine in Modal (No change from previous version)
+        const renderCurrentRoutine = () => {
+            const routine = getData('weeklyRoutine').sort((a,b) => { if (a.day !== b.day) return parseInt(a.day) - parseInt(b.day); return (a.startTime || '').localeCompare(b.startTime || ''); });
+            currentRoutineListEl.innerHTML = '';
+            if (routine.length === 0) { currentRoutineListEl.innerHTML = '<p class="text-gray-400 italic">No routine set yet.</p>'; return; }
+            routine.forEach(item => {
+                const div = document.createElement('div'); div.className = 'bg-gray-700 p-2 rounded-md flex justify-between items-center text-sm';
+                div.innerHTML = `<div><p class="font-medium">${item.name} (${DAYS_OF_WEEK[item.day]})</p><p class="text-xs text-gray-300">${formatTime(item.startTime)}${item.endTime ? ' - ' + formatTime(item.endTime) : ''} ${item.location ? ' - ' + item.location : ''}</p></div><button class="text-red-400 hover:text-red-600 text-xs" onclick="deleteItem('weeklyRoutine', '${item.id}')">Delete</button>`;
+                currentRoutineListEl.appendChild(div);
+            });
+        };
 
-            if (exams.length === 0) {
-                 listContainer.innerHTML = '<p class="text-center text-gray-500 mt-4">No exams added yet.</p>';
-                 return;
-            }
-
+        // Render Exams (No change)
+        const renderExams = () => { /* ... content identical to previous version ... */
+            const exams = getData('exams').sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+            examListEl.innerHTML = '';
+            if (exams.length === 0) { examListEl.innerHTML = '<p class="text-gray-400 italic">No exams scheduled yet.</p>'; return; }
             exams.forEach(exam => {
-                const item = document.createElement('div');
-                item.className = 'card flex justify-between items-start'; // Use card style
-                item.innerHTML = `
-                    <div>
-                        <h4 class="font-semibold text-lg">${exam.subject}</h4>
-                        <p class="text-sm text-gray-600">Date: ${formatDate(exam.date)} at ${formatTime(exam.time)}</p>
-                        ${exam.location ? `<p class="text-sm text-gray-500 italic">Location: ${exam.location}</p>` : ''}
-                        ${exam.syllabusLink ? `<a href="${exam.syllabusLink}" target="_blank" rel="noopener noreferrer" class="text-sm text-lilac hover:underline mt-1 inline-block">View Syllabus</a>` : '<p class="text-sm text-gray-400 mt-1">No syllabus link</p>'}
-                    </div>
-                    <div class="flex flex-col space-y-1 items-end ml-4">
-                        <button class="btn btn-secondary btn-sm text-xs" onclick="editExam('${exam.id}')">Edit</button>
-                        <button class="btn btn-danger btn-sm text-xs" onclick="deleteExam('${exam.id}')">Delete</button>
-                    </div>
-                `;
-                listContainer.appendChild(item);
+                const div = document.createElement('div'); div.className = 'bg-gray-700 p-3 rounded-md text-sm';
+                div.innerHTML = `<div class="flex justify-between items-start mb-1"><p class="font-medium">${exam.name}</p><button class="text-red-400 hover:text-red-600 text-xs ml-2" onclick="deleteItem('exams', '${exam.id}')">Delete</button></div><p class="text-xs text-gray-400 mb-1">Date: ${formatDateTime(exam.dateTime)}</p>${exam.syllabusName ? `<p class="text-xs text-gray-400">Syllabus: ${exam.syllabusName} <span class="italic text-gray-500">(file name only)</span></p>` : ''}`;
+                examListEl.appendChild(div);
             });
         };
 
-        // Render Assignments
-        const renderAssignments = () => {
-            const listContainer = $('#assignmentList');
-            listContainer.innerHTML = ''; // Clear list
-            assignments.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)); // Sort by due date
+        // Render Notes (No change)
+        const renderNotes = () => { /* ... content identical to previous version ... */
+            const notes = getData('notes').sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+            noteListEl.innerHTML = '';
+            if (notes.length === 0) { noteListEl.innerHTML = '<p class="text-gray-400 italic">No notes added yet.</p>'; return; }
+            notes.forEach(note => {
+                const div = document.createElement('div'); div.className = 'bg-gray-700 p-3 rounded-md text-sm';
+                const isValidLink = note.link && (note.link.startsWith('http://') || note.link.startsWith('https://'));
+                div.innerHTML = `<div class="flex justify-between items-start mb-1"><div><p class="font-medium">${note.title}</p><p class="text-xs text-gray-400">${note.subject || 'No Subject'}</p><p class="text-xs text-gray-500">Added: ${formatNoteDate(note.dateAdded)}</p></div><button class="text-red-400 hover:text-red-600 text-xs ml-2" onclick="deleteItem('notes', '${note.id}')">Delete</button></div>${isValidLink ? `<a href="${note.link}" target="_blank" rel="noopener noreferrer" class="text-xs accent-lilac-text hover:underline break-all">Link to Note</a>` : `<p class="text-xs text-gray-500 italic">${note.link ? 'Invalid or missing link' : 'No link provided'}</p>`}`;
+                noteListEl.appendChild(div);
+            });
+        };
 
-             if (assignments.length === 0) {
-                 listContainer.innerHTML = '<p class="text-center text-gray-500 mt-4">No assignments added yet.</p>';
-                 return;
-            }
-
+        // Render Assignments (No change)
+        const renderAssignments = () => { /* ... content identical to previous version ... */
+            const assignments = getData('assignments').sort((a, b) => new Date(a.dueDate + 'T00:00:00') - new Date(b.dueDate + 'T00:00:00'));
+            assignmentListEl.innerHTML = '';
+            if (assignments.length === 0) { assignmentListEl.innerHTML = '<p class="text-gray-400 italic">No assignments tracked yet.</p>'; return; }
             assignments.forEach(assignment => {
-                const item = document.createElement('div');
-                item.className = 'card flex justify-between items-start'; // Use card style
-                 const dueDate = new Date(assignment.dueDate + 'T' + (assignment.dueTime || '00:00'));
-                 const isPastDue = dueDate < new Date();
-
-                item.innerHTML = `
-                    <div class="${isPastDue ? 'opacity-60' : ''}">
-                        <h4 class="font-semibold text-lg">${assignment.subject}</h4>
-                        <p class="text-sm text-gray-700 my-1">${assignment.description}</p>
-                        <p class="text-sm ${isPastDue ? 'text-red-600 font-medium' : 'text-gray-600'}">
-                            Due: ${formatDate(assignment.dueDate)} ${assignment.dueTime ? 'at ' + formatTime(assignment.dueTime) : ''}
-                            ${isPastDue ? ' (Past Due)' : ''}
-                        </p>
-                    </div>
-                    <div class="flex flex-col space-y-1 items-end ml-4">
-                        <button class="btn btn-secondary btn-sm text-xs" onclick="editAssignment('${assignment.id}')">Edit</button>
-                        <button class="btn btn-danger btn-sm text-xs" onclick="deleteAssignment('${assignment.id}')">Delete</button>
-                    </div>
-                `;
-                listContainer.appendChild(item);
+                const div = document.createElement('div');
+                const dueDateStart = new Date(assignment.dueDate + 'T00:00:00'); const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+                const isPastDue = todayStart > dueDateStart;
+                div.className = `bg-gray-700 p-3 rounded-md text-sm ${isPastDue ? 'opacity-60' : ''}`;
+                div.innerHTML = `<div class="flex justify-between items-start mb-1"><div><p class="font-medium">${assignment.name}</p>${assignment.subject ? `<p class="text-xs text-gray-500">${assignment.subject}</p>` : ''}</div><button class="text-red-400 hover:text-red-600 text-xs ml-2" onclick="deleteItem('assignments', '${assignment.id}')">Delete</button></div><p class="text-xs ${isPastDue ? 'text-red-400 font-medium' : 'text-gray-400'}">Due: ${formatDate(assignment.dueDate)} ${isPastDue ? '(Past Due)' : ''}</p>`;
+                assignmentListEl.appendChild(div);
             });
         };
 
-        // Render Notes sorted by Date
-        const renderNotes = () => {
-            const listContainer = $('#noteList');
-            listContainer.innerHTML = ''; // Clear list
-
-             if (notes.length === 0) {
-                 listContainer.innerHTML = '<p class="text-center text-gray-500 mt-4">No notes added yet.</p>';
-                 return;
-            }
-
-            // Separate notes with and without dates
-            const datedNotes = notes.filter(note => note.date);
-            const undatedNotes = notes.filter(note => !note.date);
-
-            // Sort dated notes: newest first (descending)
-            datedNotes.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            // Combine sorted dated notes and undated notes (undated appear last)
-            const sortedNotes = [...datedNotes, ...undatedNotes];
-
-            sortedNotes.forEach(note => {
-                const item = document.createElement('div');
-                item.className = 'card flex justify-between items-start'; // Use card style
-
-                item.innerHTML = `
-                    <div>
-                        <h4 class="font-semibold text-lg">${note.title}</h4>
-                        <p class="text-sm text-gray-600">Subject: ${note.subject}</p>
-                        ${note.date ? `<p class="text-sm text-gray-500">Date: ${formatDate(note.date)}</p>` : '<p class="text-sm text-gray-400">Date: Not specified</p>'}
-                        <a href="${note.link}" target="_blank" rel="noopener noreferrer" class="text-sm text-lilac hover:underline mt-1 inline-block">View Note</a>
-                    </div>
-                    <div class="flex flex-col space-y-1 items-end ml-4">
-                        <button class="btn btn-secondary btn-sm text-xs" onclick="editNote('${note.id}')">Edit</button>
-                        <button class="btn btn-danger btn-sm text-xs" onclick="deleteNote('${note.id}')">Delete</button>
-                    </div>
-                `;
-                listContainer.appendChild(item);
-            });
-        };
-
-
-        // --- CRUD Operations ---
-
-        // Add or Update Class
-        $('#classForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = $('#classId').value;
-            const newClass = {
-                id: id || generateId(),
-                subject: $('#classSubject').value.trim(),
-                day: $('#classDay').value,
-                time: $('#classTime').value,
-                location: $('#classLocation').value.trim()
-            };
-
-            if (id) { // Update existing
-                classes = classes.map(c => c.id === id ? newClass : c);
-                showMessage('Class updated successfully!');
-            } else { // Add new
-                classes.push(newClass);
-                showMessage('Class added successfully!');
-            }
-            saveData(LOCAL_STORAGE_KEYS.CLASSES, classes);
-            renderClasses();
-            closeModal('classModal');
-        });
-
-        // Edit Class
-        window.editClass = (id) => {
-            const classToEdit = classes.find(c => c.id === id);
-            if (classToEdit) {
-                openModal('classModal', classToEdit);
-            }
-        };
-
-        // Delete Class
-        window.deleteClass = (id) => {
-            // *** UPDATED: Use custom confirmation message ***
-            if (confirm(DELETE_CONFIRM_MSG)) {
-                classes = classes.filter(c => c.id !== id);
-                saveData(LOCAL_STORAGE_KEYS.CLASSES, classes);
-                renderClasses();
-                showMessage('Class deleted.');
-            }
-        };
-
-        // Add or Update Exam
-        $('#examForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = $('#examId').value;
-            const newExam = {
-                id: id || generateId(),
-                subject: $('#examSubject').value.trim(),
-                date: $('#examDate').value,
-                time: $('#examTime').value,
-                syllabusLink: $('#examSyllabus').value.trim(),
-                location: $('#examLocation').value.trim()
-            };
-
-            if (id) {
-                exams = exams.map(ex => ex.id === id ? newExam : ex);
-                 showMessage('Exam updated successfully!');
-            } else {
-                exams.push(newExam);
-                 showMessage('Exam added successfully!');
-            }
-            saveData(LOCAL_STORAGE_KEYS.EXAMS, exams);
-            renderExams();
-            closeModal('examModal');
-        });
-
-         // Edit Exam
-        window.editExam = (id) => {
-            const examToEdit = exams.find(ex => ex.id === id);
-            if (examToEdit) {
-                openModal('examModal', examToEdit);
-            }
-        };
-
-        // Delete Exam
-        window.deleteExam = (id) => {
-             // *** UPDATED: Use custom confirmation message ***
-            if (confirm(DELETE_CONFIRM_MSG)) {
-                exams = exams.filter(ex => ex.id !== id);
-                saveData(LOCAL_STORAGE_KEYS.EXAMS, exams);
-                renderExams();
-                showMessage('Exam deleted.');
-            }
-        };
-
-         // Add or Update Assignment
-        $('#assignmentForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = $('#assignmentId').value;
-            const newAssignment = {
-                id: id || generateId(),
-                subject: $('#assignmentSubject').value.trim(),
-                description: $('#assignmentDesc').value.trim(),
-                dueDate: $('#assignmentDueDate').value,
-                dueTime: $('#assignmentDueTime').value
-            };
-
-            if (id) {
-                assignments = assignments.map(a => a.id === id ? newAssignment : a);
-                 showMessage('Assignment updated successfully!');
-            } else {
-                assignments.push(newAssignment);
-                 showMessage('Assignment added successfully!');
-            }
-            saveData(LOCAL_STORAGE_KEYS.ASSIGNMENTS, assignments);
-            renderAssignments();
-            closeModal('assignmentModal');
-        });
-
-         // Edit Assignment
-        window.editAssignment = (id) => {
-            const assignmentToEdit = assignments.find(a => a.id === id);
-            if (assignmentToEdit) {
-                openModal('assignmentModal', assignmentToEdit);
-            }
-        };
-
-        // Delete Assignment
-        window.deleteAssignment = (id) => {
-             // *** UPDATED: Use custom confirmation message ***
-            if (confirm(DELETE_CONFIRM_MSG)) {
-                assignments = assignments.filter(a => a.id !== id);
-                saveData(LOCAL_STORAGE_KEYS.ASSIGNMENTS, assignments);
-                renderAssignments();
-                 showMessage('Assignment deleted.');
-            }
-        };
-
-        // Add or Update Note (with date)
-        $('#noteForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = $('#noteId').value;
-            const newNote = {
-                id: id || generateId(),
-                subject: $('#noteSubject').value.trim(),
-                title: $('#noteTitle').value.trim(),
-                date: $('#noteDate').value || null, // Store date, or null if empty
-                link: $('#noteLink').value.trim()
-            };
-
-             // Basic URL validation
-            try {
-                new URL(newNote.link);
-            } catch (_) {
-                showMessage('Please enter a valid URL for the note link.', 4000);
-                return;
-            }
-
-
-            if (id) {
-                notes = notes.map(n => n.id === id ? newNote : n);
-                 showMessage('Note link updated successfully!');
-            } else {
-                notes.push(newNote);
-                 showMessage('Note link added successfully!');
-            }
-            saveData(LOCAL_STORAGE_KEYS.NOTES, notes);
-            renderNotes(); // Re-render the updated notes list
-            closeModal('noteModal');
-        });
-
-         // Edit Note
-        window.editNote = (id) => {
-            const noteToEdit = notes.find(n => n.id === id);
-            if (noteToEdit) {
-                openModal('noteModal', noteToEdit);
-            }
-        };
-
-        // Delete Note
-        window.deleteNote = (id) => {
-             // *** UPDATED: Use custom confirmation message ***
-            if (confirm(DELETE_CONFIRM_MSG)) {
-                notes = notes.filter(n => n.id !== id);
-                saveData(LOCAL_STORAGE_KEYS.NOTES, notes);
-                renderNotes();
-                 showMessage('Note link deleted.');
-            }
-        };
-
-
-        // --- Tab Switching ---
-        const tabs = $$('.tab-button');
-        const tabContents = $$('.tab-content');
-
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Deactivate all tabs and content
-                tabs.forEach(t => t.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-
-                // Activate clicked tab and corresponding content
-                tab.classList.add('active');
-                const targetTab = tab.getAttribute('data-tab');
-                $(`#tab-${targetTab}`).classList.add('active');
-            });
-        });
-
-        // --- Notifications ---
-        let notificationsEnabled = localStorage.getItem(LOCAL_STORAGE_KEYS.NOTIFICATIONS_ENABLED) === 'true';
-        const notificationPrompt = $('#notification-prompt');
-
-        // Function to request notification permission
-        const requestNotificationPermission = () => {
-            if (!('Notification' in window)) {
-                showMessage('This browser does not support desktop notification.', 5000);
-                return;
-            }
-
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    notificationsEnabled = true;
-                    localStorage.setItem(LOCAL_STORAGE_KEYS.NOTIFICATIONS_ENABLED, 'true');
-                    notificationPrompt.style.display = 'none';
-                    showMessage('Notifications enabled!');
-                    checkUpcomingEvents(); // Run check immediately after enabling
-                } else {
-                    notificationsEnabled = false;
-                    localStorage.setItem(LOCAL_STORAGE_KEYS.NOTIFICATIONS_ENABLED, 'false');
-                     showMessage('Notifications permission denied.', 4000);
-                }
-            });
-        };
-
-        // Show prompt if permission not granted or denied yet
-        if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-             notificationPrompt.style.display = 'block';
-        }
-
-        $('#enableNotificationsBtn').addEventListener('click', requestNotificationPermission);
-        $('#dismissNotificationsBtn').addEventListener('click', () => {
-            notificationPrompt.style.display = 'none';
-        });
-
-
-        // Function to send a notification
-        const sendNotification = (title, options) => {
-            if (!notificationsEnabled || Notification.permission !== 'granted') {
-                return; // Don't send if not enabled or permission denied
-            }
-            // Add a default icon if none provided
-            const defaultOptions = {
-                 icon: 'https://placehold.co/48x48/d8b4fe/ffffff?text=🔔' // Default Lilac Bell
-            };
-            new Notification(title, { ...defaultOptions, ...options });
-        };
-
-         // Mark an event as notified
-        const markAsNotified = (eventId) => {
-            if (!notifiedEvents.includes(eventId)) {
-                notifiedEvents.push(eventId);
-                // Limit the size of notifiedEvents to prevent excessive storage use
-                if (notifiedEvents.length > 100) {
-                    notifiedEvents = notifiedEvents.slice(-100); // Keep only the last 100
-                }
-                saveData(LOCAL_STORAGE_KEYS.NOTIFIED_EVENTS, notifiedEvents);
-            }
-        };
-
-        // Check upcoming events and send notifications
-        const checkUpcomingEvents = () => {
-            if (!notificationsEnabled || Notification.permission !== 'granted') return;
-
+        // --- NEW: Update Class Status Section ---
+        const updateClassStatus = () => {
             const now = new Date();
-            const nowTime = now.getTime();
-            const todayDay = now.toLocaleDateString('en-US', { weekday: 'long' }); // e.g., "Monday"
+            const currentDay = now.getDay(); // 0=Sun, 1=Mon,...
+            const currentTimeMs = now.getTime();
 
-            // 1. Check Classes for today
-            classes.forEach(cls => {
-                if (cls.day === todayDay && cls.time) {
-                    const [hour, minute] = cls.time.split(':');
-                    const classDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(hour), parseInt(minute));
-                    const classTime = classDateTime.getTime();
-                    const timeDiffMinutes = (classTime - nowTime) / (1000 * 60);
-                    const eventId = `class_${cls.id}_${now.toISOString().split('T')[0]}`; // Unique ID per day
+            const routine = getData('weeklyRoutine');
+            const todayClasses = routine
+                .filter(item => parseInt(item.day, 10) === currentDay && item.startTime) // Filter for today & ensure startTime exists
+                .map(item => {
+                    // Create Date objects for today's start and end times
+                    const [startHours, startMinutes] = item.startTime.split(':').map(Number);
+                    const startDate = new Date(now);
+                    startDate.setHours(startHours, startMinutes, 0, 0);
 
-                    if (timeDiffMinutes > 0 && timeDiffMinutes <= NOTIFICATION_LEAD_TIME_MINUTES) {
-                        if (!notifiedEvents.includes(eventId)) {
-                            sendNotification('Upcoming Class Reminder', {
-                                body: `${cls.subject} starts at ${formatTime(cls.time)} ${cls.location ? 'in ' + cls.location : ''}.`
-                            });
-                            markAsNotified(eventId);
+                    let endDate = null;
+                    if (item.endTime) {
+                        const [endHours, endMinutes] = item.endTime.split(':').map(Number);
+                        endDate = new Date(now);
+                        endDate.setHours(endHours, endMinutes, 0, 0);
+                        // Handle cases where end time is on the next day (e.g., class ends past midnight)
+                        if (endDate < startDate) {
+                            endDate.setDate(endDate.getDate() + 1);
                         }
                     }
-                }
-            });
+                    return { ...item, startDate, endDate };
+                })
+                .sort((a, b) => a.startDate - b.startDate); // Sort by start Date object
 
-            // 2. Check Exams
-            exams.forEach(exam => {
-                 if (exam.date && exam.time) {
-                    const examDateTime = new Date(`${exam.date}T${exam.time}`);
-                    const examTime = examDateTime.getTime();
-                    const timeDiffMinutes = (examTime - nowTime) / (1000 * 60);
-                    const eventId = `exam_${exam.id}`;
+            let currentClass = null;
+            let nextClass = null;
 
-                    if (timeDiffMinutes > 0 && timeDiffMinutes <= NOTIFICATION_LEAD_TIME_MINUTES) {
-                         if (!notifiedEvents.includes(eventId)) {
-                            sendNotification('Upcoming Exam Reminder', {
-                                body: `${exam.subject} exam starts at ${formatTime(exam.time)} on ${formatDate(exam.date)}. ${exam.location ? 'Location: ' + exam.location : ''}`,
-                                icon: 'https://placehold.co/48x48/d8b4fe/ffffff?text=❗' // Alert icon
-                            });
-                             markAsNotified(eventId);
-                        }
-                    }
+            // Find current and next class
+            for (const cls of todayClasses) {
+                const startTimeMs = cls.startDate.getTime();
+                // Use end time if available, otherwise consider class current if started and next hasn't
+                const endTimeMs = cls.endDate ? cls.endDate.getTime() : Infinity;
+
+                if (currentTimeMs >= startTimeMs && currentTimeMs < endTimeMs) {
+                    // Basic check: current time is between start and end
+                    currentClass = cls;
+                    // Don't break yet, need to find the *next* class after this current one ends
+                } else if (currentTimeMs < startTimeMs) {
+                     // This is the first class starting after the current time
+                     if (!nextClass) {
+                         nextClass = cls;
+                     }
+                     // Optimization: if we found the current class OR the next class is the first one,
+                     // and this class starts later than the found next class, we can stop searching for 'next'.
+                     // However, the simple loop is fine here.
                  }
-            });
 
-            // 3. Check Assignments Due Soon
-            assignments.forEach(assignment => {
-                 if (assignment.dueDate) {
-                    const dueDateTime = new Date(`${assignment.dueDate}T${assignment.dueTime || '23:59:59'}`); // Assume end of day if no time
-                    const dueTime = dueDateTime.getTime();
-                    const timeDiffHours = (dueTime - nowTime) / (1000 * 60 * 60);
-                    const eventId = `assignment_${assignment.id}`;
-
-                    // Notify if due within the threshold and not already past due
-                    if (timeDiffHours > 0 && timeDiffHours <= ASSIGNMENT_DUE_SOON_HOURS) {
-                        if (!notifiedEvents.includes(eventId)) {
-                             sendNotification('Assignment Due Soon', {
-                                body: `${assignment.subject} - "${assignment.description.substring(0, 30)}..." is due on ${formatDate(assignment.dueDate)}.`,
-                                icon: 'https://placehold.co/48x48/d8b4fe/ffffff?text=📝' // Note icon
-                            });
-                             markAsNotified(eventId);
-                        }
-                    }
+                 // More robust check for current class if end time is missing:
+                 // If no end time, is it current if it started and the *next* class hasn't started yet?
+                 if (!cls.endDate && currentTimeMs >= startTimeMs) {
+                     // Find the *very next* scheduled class start time
+                     const nextStartTimeInLoop = todayClasses.find(c => c.startDate.getTime() > startTimeMs)?.startDate.getTime() ?? Infinity;
+                     if (currentTimeMs < nextStartTimeInLoop) {
+                         currentClass = cls; // It's current until the next one begins
+                     }
                  }
-            });
 
-             // Clean up old notified events (older than 7 days) - Optional but good practice
-            const sevenDaysAgo = nowTime - (7 * 24 * 60 * 60 * 1000);
-            notifiedEvents = notifiedEvents.filter(eventId => {
-                // Simple check: if it's a daily class event, parse date from ID
-                if (eventId.startsWith('class_')) {
-                    const parts = eventId.split('_');
-                    if (parts.length === 3) {
-                        try {
-                            const eventDate = new Date(parts[2]).getTime();
-                            return eventDate >= sevenDaysAgo;
-                        } catch (e) { return true; } // Keep if date parsing fails
-                    }
+                 // If we found a current class, the *next* class is the one immediately following it in the sorted list
+                 if (currentClass && cls.startDate.getTime() > currentClass.startDate.getTime() && !nextClass) {
+                    nextClass = cls;
+                    break; // Found current and the one right after it
+                 }
+            }
+
+
+            // Update DOM Elements
+            if (currentClass) {
+                currentClassInfoEl.textContent = `${currentClass.name} (${formatTime(currentClass.startTime)}${currentClass.endTime ? ' - ' + formatTime(currentClass.endTime) : ''})`;
+                currentClassInfoEl.title = currentClassInfoEl.textContent; // Set title for potential truncation
+                currentClassInfoEl.classList.add('highlight');
+            } else {
+                currentClassInfoEl.textContent = 'No current class';
+                currentClassInfoEl.title = '';
+                currentClassInfoEl.classList.remove('highlight');
+            }
+
+            if (nextClass) {
+                nextClassInfoEl.textContent = `${nextClass.name} at ${formatTime(nextClass.startTime)}`;
+                 nextClassInfoEl.title = nextClassInfoEl.textContent;
+
+                // Calculate countdown
+                const timeDiffMs = nextClass.startDate.getTime() - currentTimeMs;
+                if (timeDiffMs > 0) {
+                    const totalSeconds = Math.floor(timeDiffMs / 1000);
+                    const hours = Math.floor(totalSeconds / 3600);
+                    const minutes = Math.floor((totalSeconds % 3600) / 60);
+                    const seconds = totalSeconds % 60;
+                    countdownTimerEl.textContent =
+                        `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                } else {
+                     countdownTimerEl.textContent = 'Starting...'; // Or handle if somehow negative
                 }
-                // Keep non-class events or those we can't parse date for (could improve this)
-                return true;
-            });
-            saveData(LOCAL_STORAGE_KEYS.NOTIFIED_EVENTS, notifiedEvents);
 
+            } else {
+                nextClassInfoEl.textContent = 'No more classes today';
+                nextClassInfoEl.title = '';
+                countdownTimerEl.textContent = '--:--:--';
+            }
         };
+
+
+        // --- Event Handlers ---
+        // Add Routine Item
+        document.getElementById('addRoutineItemForm').addEventListener('submit', (e) => { /* ... content identical to previous version ... */
+            e.preventDefault(); const name = document.getElementById('routineClassName').value; const day = document.getElementById('routineDay').value; const startTime = document.getElementById('routineStartTime').value; const endTime = document.getElementById('routineEndTime').value; const location = document.getElementById('routineLocation').value;
+            const routine = getData('weeklyRoutine'); routine.push({ id: generateId(), name, day, startTime, endTime, location }); saveData('weeklyRoutine', routine);
+            renderCurrentRoutine(); renderWeeklyClasses(); updateClassStatus(); // Update status on change
+            e.target.reset(); showToast(`Class "${name}" added to routine.`);
+        });
+        // Add Exam
+        document.getElementById('addExamForm').addEventListener('submit', (e) => { /* ... content identical to previous version ... */
+            e.preventDefault(); const name = document.getElementById('examName').value; const dateTime = document.getElementById('examDateTime').value; const syllabusFile = document.getElementById('examSyllabus').files[0];
+            const exams = getData('exams'); exams.push({ id: generateId(), name, dateTime, syllabusName: syllabusFile ? syllabusFile.name : null }); saveData('exams', exams);
+            renderExams(); closeModal('addExamModal'); e.target.reset(); showToast(`Exam "${name}" added.`);
+        });
+        // Add Note
+        document.getElementById('addNoteForm').addEventListener('submit', (e) => { /* ... content identical to previous version ... */
+             e.preventDefault(); const subject = document.getElementById('noteSubject').value; const title = document.getElementById('noteTitle').value; const noteLink = document.getElementById('noteLink').value;
+             const notes = getData('notes'); notes.push({ id: generateId(), subject, title, link: noteLink, dateAdded: new Date().toISOString() }); saveData('notes', notes);
+             renderNotes(); closeModal('addNoteModal'); e.target.reset(); showToast(`Note "${title}" added.`);
+        });
+        // Add Assignment
+        document.getElementById('addAssignmentForm').addEventListener('submit', (e) => { /* ... content identical to previous version ... */
+             e.preventDefault(); const name = document.getElementById('assignmentName').value; const subject = document.getElementById('assignmentSubject').value; const dueDate = document.getElementById('assignmentDueDate').value;
+             const assignments = getData('assignments'); assignments.push({ id: generateId(), name, subject, dueDate }); saveData('assignments', assignments);
+             renderAssignments(); closeModal('addAssignmentModal'); e.target.reset(); showToast(`Assignment "${name}" added.`);
+        });
+        // Delete Item
+        window.deleteItem = (key, id) => { /* ... content identical to previous version, but added updateClassStatus() call ... */
+             if (!confirm('Are you sure you want to delete this item?')) return;
+            let items = getData(key); const itemIndex = items.findIndex(item => item.id === id); let itemName = 'Item';
+            if (itemIndex > -1) {
+                 itemName = items[itemIndex].name || items[itemIndex].title || 'Item'; items = items.filter(item => item.id !== id); saveData(key, items);
+                 if (key === 'weeklyRoutine') { renderCurrentRoutine(); renderWeeklyClasses(); updateClassStatus(); /* Update status on change */ }
+                 else if (key === 'exams') renderExams(); else if (key === 'notes') renderNotes(); else if (key === 'assignments') renderAssignments();
+                 showToast(`"${itemName}" deleted.`);
+            }
+        };
+
+        // --- Notification Logic --- (No changes in this section)
+        const requestNotificationPermission = () => { /* ... content identical to previous version ... */
+            if (!("Notification" in window)) { showToast("Notifications not supported."); return false; } if (Notification.permission === "granted") { return true; } if (Notification.permission !== "denied") { Notification.requestPermission().then(permission => { if (permission === "granted") { showToast("Notifications enabled!"); return true; } else { showToast("Notifications disabled."); return false; } }); } return false;
+        };
+        const showNotification = (title, body) => { /* ... content identical to previous version ... */
+            if (Notification.permission === "granted") { try { new Notification(title, { body: body, tag: title + body }); } catch (e) { console.error("Error showing notification:", e); showToast(`${title}: ${body}`); } } else { showToast(`${title}: ${body}`); }
+        };
+        const checkReminders = () => { /* ... content identical to previous version ... */
+            const now = new Date(); const currentDay = now.getDay(); const currentTime = now.getHours() * 60 + now.getMinutes(); const reminderThreshold = CLASS_REMINDER_MINUTES; const assignmentThreshold = ASSIGNMENT_REMINDER_HOURS * 60 * 60 * 1000;
+            const notifiedKey = 'notifiedEvents'; let notifiedEventsData = getData(notifiedKey).reduce((acc, item) => { if (item && item.id && item.time) acc[item.id] = item.time; return acc; }, {}); let updatedNotifiedEvents = false;
+            const wasNotifiedRecently = (eventId) => { const lastNotifiedTime = notifiedEventsData[eventId]; if (!lastNotifiedTime) return false; return (now.getTime() - lastNotifiedTime) < (12 * 60 * 60 * 1000); }; const markAsNotified = (eventId) => { notifiedEventsData[eventId] = now.getTime(); updatedNotifiedEvents = true; };
+            const routine = getData('weeklyRoutine'); routine.forEach(cls => { if (parseInt(cls.day, 10) === currentDay && cls.startTime) { try { const [startHours, startMinutes] = cls.startTime.split(':').map(Number); const classStartTimeMinutes = startHours * 60 + startMinutes; const timeDiffMinutes = classStartTimeMinutes - currentTime; const eventId = cls.id + '_routine_' + currentDay; if (timeDiffMinutes > 0 && timeDiffMinutes <= reminderThreshold && !wasNotifiedRecently(eventId)) { showNotification('Upcoming Class Reminder', `${cls.name} is starting in about ${timeDiffMinutes} minutes.`); markAsNotified(eventId); } } catch (e) { console.error("Error parsing routine class time:", cls.startTime, e); } } });
+            const exams = getData('exams'); exams.forEach(exam => { const examTime = new Date(exam.dateTime); const timeDiff = examTime - now; const eventId = exam.id + '_exam'; if (timeDiff > 0 && timeDiff <= (CLASS_REMINDER_MINUTES * 60 * 1000) && !wasNotifiedRecently(eventId)) { showNotification('Upcoming Exam Reminder', `${exam.name} is starting in about ${CLASS_REMINDER_MINUTES} minutes.`); markAsNotified(eventId); } });
+            const assignments = getData('assignments'); assignments.forEach(assignment => { const dueDateEnd = new Date(assignment.dueDate + 'T23:59:59'); const timeDiff = dueDateEnd - now; const eventId = assignment.id + '_assignment'; if (timeDiff > 0 && timeDiff <= assignmentThreshold && !wasNotifiedRecently(eventId)) { showNotification('Assignment Due Soon', `${assignment.name} is due tomorrow (${formatDate(assignment.dueDate)}).`); markAsNotified(eventId); } });
+            const twoDaysAgo = now.getTime() - (2 * 24 * 60 * 60 * 1000); let cleanedNotifiedEvents = false; for (const eventId in notifiedEventsData) { if (notifiedEventsData[eventId] < twoDaysAgo) { delete notifiedEventsData[eventId]; cleanedNotifiedEvents = true; } } if (updatedNotifiedEvents || cleanedNotifiedEvents) { const eventsToSave = Object.entries(notifiedEventsData).map(([id, time]) => ({ id, time })); saveData(notifiedKey, eventsToSave); }
+        };
+
 
         // --- Initial Load ---
         document.addEventListener('DOMContentLoaded', () => {
-            renderClasses();
+            requestNotificationPermission();
+
+            // Initial rendering of all sections
+            renderWeeklyClasses();
             renderExams();
+            renderNotes();
             renderAssignments();
-            renderNotes(); // Render notes with the new sorting
+            updateClassStatus(); // Initial call for status section
 
-            // Add event listeners for Add buttons
-            $('#addClassBtn').addEventListener('click', () => openModal('classModal'));
-            $('#addExamBtn').addEventListener('click', () => openModal('examModal'));
-            $('#addAssignmentBtn').addEventListener('click', () => openModal('assignmentModal'));
-            $('#addNoteBtn').addEventListener('click', () => openModal('noteModal'));
+            // Set up reminder checks (includes notifications)
+            setInterval(checkReminders, 60 * 1000); // Check every 60 seconds
+            checkReminders(); // Initial check immediately
 
-            // Check for notifications periodically (e.g., every minute)
-            // Only start interval if permission might be granted later or is already granted
-            if ('Notification' in window && Notification.permission !== 'denied') {
-                 // Run first check shortly after load
-                 setTimeout(checkUpcomingEvents, 5000); // Wait 5 seconds
-                 // Then check every minute
-                 setInterval(checkUpcomingEvents, 60 * 1000);
-            } else if (Notification.permission === 'denied') {
-                console.warn("Notification permission is denied. Reminders will not work.");
-            }
+            // Set up class status timer (updates countdown every second)
+            if (classStatusInterval) clearInterval(classStatusInterval); // Clear previous interval if any
+            classStatusInterval = setInterval(updateClassStatus, 1000); // Update status every second
 
-            console.log("Academic Organizer App Loaded.");
+            // Add event listeners for modal buttons
+            document.getElementById('manageRoutineBtn').addEventListener('click', () => openModal('manageRoutineModal'));
+            document.getElementById('addExamBtn').addEventListener('click', () => openModal('addExamModal'));
+            document.getElementById('addNoteBtn').addEventListener('click', () => openModal('addNoteModal'));
+            document.getElementById('addAssignmentBtn').addEventListener('click', () => openModal('addAssignmentModal'));
         });
 
     </script>
 
 </body>
 </html>
+
